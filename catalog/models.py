@@ -9,7 +9,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='images/', verbose_name='Изображение')
     category = models.ForeignKey(to='Category', on_delete=models.CASCADE, verbose_name='Категория',
                                  related_name='products')
-    purchase_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='цена за покупку')
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='цена за покупку')
     created_at = models.DateField(verbose_name='Дата создания')
     updated_at = models.DateField(verbose_name='дата изменения')
 
@@ -19,7 +19,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
-        ordering = ['name', 'purchase_price']
+        ordering = ['name', 'price']
 
 
 class Category(models.Model):
