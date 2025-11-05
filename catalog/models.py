@@ -10,11 +10,11 @@ class Product(models.Model):
     category = models.ForeignKey(to='Category', on_delete=models.CASCADE, verbose_name='Категория',
                                  related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='цена за покупку')
-    created_at = models.DateField(verbose_name='Дата создания')
-    updated_at = models.DateField(verbose_name='дата изменения')
+    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateField(auto_now=True, verbose_name='Дата изменения')
 
     def __str__(self):
-        return f'{self.name} {self.drscription}'
+        return f'{self.name} {self.description}'
 
     class Meta:
         verbose_name = 'продукт'
