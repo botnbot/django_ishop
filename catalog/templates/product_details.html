@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 bg-body-tertiary">
+    <h2 class="mb-4">Подробное описание</h2>
+    
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+                {% else %}
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice">
+                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Нет изображения</text>
+                    </svg>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h3 class="card-title">{{ product.name|capfirst }}</h3>
+                    <p class="card-text">{{ product.description }}</p>
+                    <p class="card-text mb-2"><strong>Цена:</strong> {{ product.price }} руб.</p>
+                    <p class="card-text mb-2"><strong>Категория:</strong> {{ product.category.name }}</p>
+                    <p class="card-text"><small class="text-muted">Создано: {{ product.created_at|date:'d M Y' }}</small></p>
+                    <p class="card-text"><small class="text-muted">Обновлено: {{ product.updated_at|date:'d M Y' }}</small></p>
+                    <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary mt-3">Назад на главную</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
