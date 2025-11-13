@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="album py-5 bg-body-tertiary">
     <div class="container">
@@ -7,18 +6,21 @@
             {% for product in products %}
             <div class="col">
                 <div class="card shadow-sm">
-
                     {% if product.image %}
-                    <img src="{{ product.image.url }}" class="bd-placeholder-img card-img-top" alt="{{ product.name }}"
-                         height="225" style="object-fit: cover;">
+                    <a href="{% url 'catalog:product_details' product.pk %}">
+                        <img src="{{ product.image.url }}" class="bd-placeholder-img card-img-top"
+                             alt="{{ product.name }}"
+                             height="225" style="object-fit: cover;">
+                    </a>
                     {% else %}
-                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
-                         xmlns="http://www.w3.org/2000/svg" role="img">
-                        <rect width="100%" height="100%" fill="#55595c"></rect>
-                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">No Image</text>
-                    </svg>
+                    <a href="{% url 'catalog:product_details' product.pk %}">
+                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                             xmlns="http://www.w3.org/2000/svg" role="img">
+                            <rect width="100%" height="100%" fill="#55595c"></rect>
+                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">No Image</text>
+                        </svg>
+                    </a>
                     {% endif %}
-
                     <div class="card-body">
                         <p class="card-text">{{ product.description|truncatechars:100 }}</p>
                         <div class="d-flex justify-content-between align-items-center">
