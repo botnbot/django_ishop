@@ -6,6 +6,7 @@ from django.views.generic import ListView, DetailView
 from catalog.models import Product
 
 
+
 class ProductsListView(ListView):
     model = Product
     template_name = 'catalog/product_list.html'
