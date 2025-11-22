@@ -1,0 +1,18 @@
+[
+{
+    "model": "catalog.category",
+    "pk": 9,
+    "fields": {
+        "name": "Камни",
+        "description": ""
+    }
+},
+{
+    "model": "catalog.category",
+    "pk": 10,
+    "fields": {
+        "name": "Руны",
+        "description": ""
+    }
+}
+]

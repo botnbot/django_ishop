@@ -1,0 +1,19 @@
+<header data-bs-theme="dark">
+    <div class="collapse text-bg-dark" id="navbarHeader">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-md-7 py-4"><h2>Магазин</h2>
+                <a href="{% url 'catalog:product_list' %}" class="text-body-secondary">Камни и руны</a>
+                </div>
+                <div class="col-sm-4 offset-md-1 py-4"><h5>Контакты</h5>
+                        <a href="{% url 'catalog:contacts' %}" class="text-white">Свяжитесь с нами</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader"
+                    aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation"><span
+                    class="navbar-toggler-icon"></span></button>
+    </div>
+</header>
