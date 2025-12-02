@@ -26,6 +26,9 @@
                     <p class="card-text"><small class="text-muted">Создано: {{ product.created_at|date:'d M Y' }}</small></p>
                     <p class="card-text"><small class="text-muted">Обновлено: {{ product.updated_at|date:'d M Y' }}</small></p>
                     <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary mt-3">Назад на главную</a>
+                    <a href="{% url 'catalog:products_update' product.pk %}" class="btn btn-primary mt-3">Редактировать</a>
+                    <a href="{% url 'catalog:products_create' %}" class="btn btn-warning mt-3">Создать</a>
+                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger mt-3">Удалить</a>
 
                 </div>
             </div>
