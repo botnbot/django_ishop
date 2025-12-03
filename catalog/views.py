@@ -22,20 +22,10 @@ class ProductsUpdateView(UpdateView):
     success_url = reverse_lazy('catalog:product_list')
 
     def form_valid(self, form):
-        product = form.instance
-
-        # Сценарий "Clear" через виджет ClearableFileInput
-        if self.request.POST.get('image-clear'):
-            product.image = None
-        else:
-            # Если новое изображение не загружено, оставляем старое
-            if not form.cleaned_data.get('image') and product.pk:
-                old_image = Product.objects.get(pk=product.pk).image
-                product.image = old_image
-
+        if form.cleaned_data.get('image-clear') and form.instance.image:
+            form.instance.image.delete(save=False)
+            form.instance.image = None
         return super().form_valid(form)
-
-
 
 class ProductsListView(ListView):
     model = Product
