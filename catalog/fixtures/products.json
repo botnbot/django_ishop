@@ -1,0 +1,93 @@
+[
+{
+    "model": "catalog.product",
+    "pk": 27,
+    "fields": {
+        "name": "янтарь",
+        "description": "жёлтый",
+        "image": "static/images/янтарь.jpeg",
+        "category": 9,
+        "price": "100.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 28,
+    "fields": {
+        "name": "яшма",
+        "description": "Красный",
+        "image": "static/images/яшма.jpeg",
+        "category": 9,
+        "price": "80.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 29,
+    "fields": {
+        "name": "малахит",
+        "description": "Зеленый",
+        "image": "static/images/малахит.jpeg",
+        "category": 9,
+        "price": "90.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 30,
+    "fields": {
+        "name": "бирюза",
+        "description": "Зеленый",
+        "image": "static/images/бирюза.jpeg",
+        "category": 9,
+        "price": "70.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 31,
+    "fields": {
+        "name": "нефрит",
+        "description": "Белый",
+        "image": "static/images/нефрит.jpeg",
+        "category": 9,
+        "price": "40.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 32,
+    "fields": {
+        "name": "Феху",
+        "description": "Символизирует богатство и успех",
+        "image": "static/images/Феху.jpeg",
+        "category": 10,
+        "price": "60.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 33,
+    "fields": {
+        "name": "Альгиз",
+        "description": "Символизирует  защиту",
+        "image": "static/images/Альгиз.jpeg",
+        "category": 10,
+        "price": "50.00",
+        "created_at": "2025-11-06",
+        "updated_at": "2025-11-06"
+    }
+}
+]

@@ -1,0 +1,27 @@
+{% extends 'blogera/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Курган</h1>
+
+    <a href="{% url 'blogera:post_create' %}" class="btn btn-success mb-3">Добавить камень</a>
+
+    {% for post in posts %}
+    <h3>{{ post.title }}</h3>
+    <p>Добавлено:{{ post.created_at|date:"d.m.Y H:i:s" }} Просмотров:{{ post.views_count }}</p>
+        <div class="card mb-3">
+            <div class="card-body">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid mb-3" style="max-width:300px;">
+                {% endif %}
+                <p>{{ post.content|truncatewords:30 }}</p>
+                <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-primary">Подробнее</a>
+                <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+                <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Постов пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}
