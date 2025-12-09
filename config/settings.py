@@ -20,6 +20,7 @@ DEBUG = True if os.getenv("DEBUG") == "True" else False
 
 ALLOWED_HOSTS = ["*"]
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
 ]
 
 LOGIN_REDIRECT_URL = reverse_lazy('catalog:products_list')
+LOGIN_URL = reverse_lazy('users:login')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 

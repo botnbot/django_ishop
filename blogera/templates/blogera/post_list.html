@@ -1,27 +1,32 @@
-{% extends 'blogera/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Курган</h1>
-
-    <a href="{% url 'blogera:post_create' %}" class="btn btn-success mb-3">Добавить камень</a>
-
+    <h2 class="text-center" class="mb-4">Мой курган</h2>
+    {% if user.is_authenticated %}
+    <div
+            class="text-center">
+        <a href="{% url 'blogera:post_create' %}" class="btn btn-secondary mb-3">Добавить камень</a>
+    </div>
+    {% endif %}
     {% for post in posts %}
     <h3>{{ post.title }}</h3>
     <p>Добавлено:{{ post.created_at|date:"d.m.Y H:i:s" }} Просмотров:{{ post.views_count }}</p>
-        <div class="card mb-3">
-            <div class="card-body">
-                {% if post.image %}
-                    <img src="{{ post.image.url }}" class="img-fluid mb-3" style="max-width:300px;">
-                {% endif %}
-                <p>{{ post.content|truncatewords:30 }}</p>
-                <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-primary">Подробнее</a>
-                <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
-                <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
-            </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            {% if post.image %}
+            <img src="{{ post.image.url }}" class="img-fluid mb-3" style="max-width:300px;">
+            {% endif %}
+            <p>{{ post.content|truncatewords:30 }}</p>
+            <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-primary">Подробнее</a>
+            {% if user.is_authenticated and post.author == user %}
+            <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+            <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
+            {% endif %}
         </div>
+    </div>
     {% empty %}
-        <p>Постов пока нет.</p>
+    <p>Постов пока нет.</p>
     {% endfor %}
 </div>
 {% endblock %}

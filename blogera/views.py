@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView
 
@@ -26,22 +26,31 @@ class PostDetailsView(DetailView):
         self.object.save()
         return self.object
 
-class PostDeleteView(DeleteView):
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blogera/confirm_post_delete.html'
     success_url = reverse_lazy('blogera:post_list')
     context_object_name = 'post'
 
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_staff
 
-class PostCreateView(CreateView):
+
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'content', 'image', 'is_published']
     template_name = 'blogera/post_create.html'
     success_url = reverse_lazy('blogera:post_list')
     context_object_name = 'post'
 
+    def form_valid(self, form):
+        form.instance.author = self.request.user  # автоматически назначает автора посту
+        return super().form_valid(form)
 
-class PostUpdateView(UpdateView):
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     fields = ['title', 'content', 'image', 'is_published']
     template_name = 'blogera/post_update.html'
@@ -49,3 +58,8 @@ class PostUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('blogera:post_details', kwargs={'pk': self.object.pk})
+
+    def test_func(self):
+        """Проверяет, что пользователь автор поста или админ."""
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_staff
