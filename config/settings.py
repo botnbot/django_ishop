@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 # Загружаем переменные окружения из файла .env
@@ -32,6 +33,8 @@ INSTALLED_APPS = [
     "catalog",
     "blogera",
 ]
+
+LOGIN_REDIRECT_URL = reverse_lazy('catalog:products_list')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
