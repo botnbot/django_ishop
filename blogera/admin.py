@@ -15,5 +15,3 @@ class PostAdmin(admin.ModelAdmin):
     )
     list_filter = ("created_at", "is_published")
     search_fields = ("title",)
-
-
