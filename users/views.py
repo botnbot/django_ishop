@@ -13,10 +13,10 @@ class RegisterView(CreateView):
     success_url = reverse_lazy("catalog:products_list")
 
     def form_valid(self, form):
-        response = super().form_valid(form)  # <-- здесь создаётся пользователь
+        response = super().form_valid(form)
         user_email = (
             self.object.email
-        )  # <-- теперь self.object — это новый пользователь
+        )
 
         send_mail(
             subject="Добро пожаловать!",
