@@ -1,4 +1,4 @@
-{% extends 'blogera/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,8 +8,10 @@
         {% csrf_token %}
         {{ form.as_p }}
 
-        <button type="submit" class="btn btn-success">Положить</button>
+        <button type="submit" class="btn btn-secondary">Положить</button>
+        {% if user.is_authenticated and post.author == user %}
         <a href="{% url 'blogera:post_list' %}" class="btn btn-secondary">Забрать</a>
+        {% endif %}
     </form>
 </div>
 {% endblock %}
