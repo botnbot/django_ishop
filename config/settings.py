@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 # Загружаем переменные окружения из файла .env
 load_dotenv(override=True)
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
