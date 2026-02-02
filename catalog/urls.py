@@ -4,10 +4,11 @@ from catalog import views
 app_name = "catalog"
 
 urlpatterns = [
-    path("", views.ProductsListView.as_view(), name="products_list"),
-    path("product/<int:pk>/", views.ProductDetailsView.as_view(), name="product_details"),
-    path("product/create/", views.ProductsCreateView.as_view(), name="product_create"),
-    path("product/<int:pk>/update/", views.ProductsUpdateView.as_view(), name="product_update"),
-    path("product/<int:pk>/delete/", views.ProductsDeleteView.as_view(), name="product_delete"),
-    path("contacts/", views.ContactsView.as_view(), name="contacts"),
+    path("", views.ProductsListView.as_view(), name="product_list"),  # список продуктов
+    path("product/<int:pk>/", views.ProductDetailView.as_view(), name="product_detail"),  # детали продукта
+    path("product/create/", views.ProductsCreateView.as_view(), name="product_create"),  # создать продукт
+    path("product/<int:pk>/update/", views.ProductsUpdateView.as_view(), name="product_update"),  # редактировать продукт
+    path("product/<int:pk>/delete/", views.ProductsDeleteView.as_view(), name="product_delete"),  # удалить продукт
+    path("contacts/", views.ContactsView.as_view(), name="contacts"),  # контакты
+    path('<int:pk>/unpublish/', views.ProductUnpublishView.as_view(), name='product_unpublish'),
 ]

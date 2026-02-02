@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ product.name }}</h1>
+<p>{{ product.description }}</p>
+<p>Цена: {{ product.price }}</p>
+<p>Статус: {{ product.get_status_display }}</p>
+{% if product.image %}
+<img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width:300px;">
+{% endif %}
+
+
+<hr>
+
+<a class="btn btn-secondary" href="{% url 'catalog:product_list' %}">Назад к списку</a>
+
+{% if can_edit %}
+<a class="btn btn-secondary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+{% endif %}
+
+{% if can_delete %}
+<a class="btn btn-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+{% endif %}
+
+{% if can_unpublish %}
+<form action="{% url 'catalog:product_unpublish' product.pk %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning btn-sm">
+        Снять с публикации
+    </button>
+</form>
+{% endif %}
+
+
+
+{% endblock %}

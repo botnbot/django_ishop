@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Список продуктов</h1>
+
+{% if user.is_authenticated %}
+<a href="{% url 'catalog:product_create' %}" class="btn btn-primary mb-3">Создать новый продукт</a>
+{% endif %}
+
+<ul>
+    {% for product in products %}
+    <li>
+        <strong>{{ product.name }}</strong> — {{ product.get_status_display }} — {{ product.price }} руб.
+
+        {% if product.image %}
+        <br>
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width:150px;">
+        {% endif %}
+
+        <br>
+        <a href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+
+        {% if product.can_edit %}
+        | <a href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+        {% endif %}
+
+        {% if product.can_delete %}
+        | <a href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+        {% endif %}
+
+        {% if product.can_unpublish %}
+        <form action="{% url 'catalog:product_unpublish' product.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-sm">Снять с публикации</button>
+        </form>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li>Продуктов пока нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

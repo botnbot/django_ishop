@@ -15,7 +15,7 @@ from .models import CustomUser
 class RegisterView(CreateView):
     template_name = "users/register.html"
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy("catalog:products_list")
+    success_url = reverse_lazy("catalog:product_list")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -51,7 +51,7 @@ class CustomLoginView(LoginView):
 
 # ------------------ Выход ------------------ #
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("catalog:products_list")
+    next_page = reverse_lazy("catalog:product_list")
 
     def dispatch(self, request, *args, **kwargs):
         messages.success(request, "Вы вышли из аккаунта")
@@ -63,10 +63,9 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = CustomUser
     form_class = CustomUserChangeForm
     template_name = "users/profile_edit.html"
-    success_url = reverse_lazy("catalog:products_list")
+    success_url = reverse_lazy("catalog:product_list")
 
     def get_object(self, queryset=None):
-        # Возвращаем текущего пользователя
         return self.request.user
 
     def form_valid(self, form):
