@@ -48,6 +48,7 @@ class Product(models.Model):
     class Meta:
         permissions = [
             ("can_unpublish_product", "Может снимать продукт с публикации"),
+            ("can_publish_product", "Может публиковать продукт"),
         ]
 
     def __str__(self):

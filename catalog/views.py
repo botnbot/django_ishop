@@ -67,7 +67,7 @@ class ProductsListView(ListView):
 
         for product in context['products']:
             product.can_edit = user.is_authenticated and (
-                        user == product.owner or user.is_staff or user.has_perm('catalog.can_unpublish_product'))
+                    user == product.owner or user.is_staff or user.has_perm('catalog.can_unpublish_product'))
             product.can_delete = user.is_authenticated and (user == product.owner or user.is_staff)
             product.can_unpublish = user.is_authenticated and user.has_perm('catalog.can_unpublish_product')
         return context
@@ -85,13 +85,26 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
             return product
 
         if (
-                self.request.user == product.owner
-                or self.request.user.has_perm("catalog.can_unpublish_product")
-                or self.request.user.is_staff
+            self.request.user == product.owner
+            or self.request.user.has_perm("catalog.can_unpublish_product")
+            or self.request.user.is_staff
         ):
             return product
 
         raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = self.object
+        user = self.request.user
+
+        context['can_publish'] = user.is_authenticated and user.has_perm('catalog.can_publish_product') and product.status != Product.STATUS_PUBLISHED
+        context['can_edit'] = user.is_authenticated and (user == product.owner or user.is_staff or user.has_perm('catalog.can_unpublish_product'))
+        context['can_delete'] = user.is_authenticated and (user == product.owner or user.is_staff)
+        context['can_unpublish'] = user.is_authenticated and user.has_perm('catalog.can_unpublish_product') and product.status == Product.STATUS_PUBLISHED
+
+        return context
+
 
 
 class ProductsCreateView(LoginRequiredMixin, CreateView):
@@ -132,6 +145,17 @@ class ProductUnpublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
         product.save(update_fields=["status"])
 
         messages.success(request, "Продукт снят с публикации")
+        return redirect("catalog:product_list")
+
+
+class ProductPublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "catalog.can_publish_product"
+
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        product.status = Product.STATUS_PUBLISHED
+        product.save(update_fields=["status"])
+        messages.success(request, "Продукт опубликован")
         return redirect("catalog:product_list")
 
 

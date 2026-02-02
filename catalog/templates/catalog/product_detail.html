@@ -31,6 +31,12 @@
 </form>
 {% endif %}
 
+{% if can_publish %}
+<form action="{% url 'catalog:product_publish' product.pk %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success btn-sm">Опубликовать</button>
+</form>
+{% endif %}
 
 
 {% endblock %}
