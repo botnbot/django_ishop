@@ -112,17 +112,20 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         user = self.request.user
         post = self.object
 
-        context["can_edit"] = (
+        post.can_edit = (
                 user.is_authenticated
                 and (user == post.author or user.is_staff or user.has_perm("blogera.can_unpublish_post"))
         )
-        context["can_delete"] = user.is_authenticated and (user == post.author or user.is_staff)
-        context["can_unpublish"] = (
+
+        post.can_delete = user.is_authenticated and (user == post.author or user.is_staff)
+
+        post.can_unpublish = (
                 user.is_authenticated
                 and user.has_perm("blogera.can_unpublish_post")
                 and post.is_published
         )
-        context["can_publish"] = (
+
+        post.can_publish = (
                 user.is_authenticated
                 and user.has_perm("blogera.can_publish_post")
                 and not post.is_published
@@ -159,6 +162,11 @@ class PostPublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
+
+        if post.is_published:
+            messages.info(request, "Пост уже опубликован")
+            return redirect("blogera:post_list")
+
         post.is_published = True
         post.save(update_fields=["is_published"])
 
