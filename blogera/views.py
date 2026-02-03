@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
@@ -7,6 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from blogera.forms import PostForm
 from blogera.models import Post
+
 
 
 class PostModerationMixin(PermissionRequiredMixin):
@@ -20,14 +22,14 @@ class PostModerationMixin(PermissionRequiredMixin):
 
 
 class OwnerOrModeratorMixin(UserPassesTestMixin):
-    """Владелец поста или модератор с правом can_unpublish_post"""
+    """Автор поста или модератор"""
 
     def test_func(self):
         obj = self.get_object()
         return (
-                self.request.user == obj.author or
-                self.request.user.has_perm("blogera.can_unpublish_post") or
-                self.request.user.is_staff
+                self.request.user == obj.author
+                or self.request.user.has_perm("blogera.can_unpublish_post")
+                or self.request.user.is_staff
         )
 
     def handle_no_permission(self):
@@ -40,23 +42,63 @@ class PostListView(ListView):
     template_name = "blogera/post_list.html"
     context_object_name = "posts"
 
+    def get_queryset(self):
+        user = self.request.user
 
-class PostDetailsView(LoginRequiredMixin, DetailView):
+        if user.is_authenticated:
+            return Post.objects.filter(is_published=True) | Post.objects.filter(author=user)
+
+        return Post.objects.filter(is_published=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        for post in context["posts"]:
+            post.can_edit = (
+                    user.is_authenticated
+                    and (user == post.author or user.is_staff or user.has_perm("blogera.can_unpublish_post"))
+            )
+            post.can_delete = user.is_authenticated and (user == post.author or user.is_staff)
+            post.can_unpublish = (
+                    user.is_authenticated
+                    and user.has_perm("blogera.can_unpublish_post")
+                    and post.is_published
+            )
+
+        return context
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = "blogera/post_details.html"
     context_object_name = "post"
 
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset)
 
-class PostCreateView(LoginRequiredMixin, CreateView):
-    model = Post
-    form_class = PostForm
-    template_name = "blogera/post_form.html"
-    success_url = reverse_lazy("blogera:post_list")
+        if post.is_published:
+            return post
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        messages.success(self.request, "Пост создан и ожидает модерации")
-        return super().form_valid(form)
+        if (
+                self.request.user == post.author
+                or self.request.user.has_perm("blogera.can_unpublish_post")
+                or self.request.user.is_staff
+        ):
+            return post
+
+        raise PermissionDenied
+
+    class PostCreateView(LoginRequiredMixin, CreateView):
+        model = Post
+        form_class = PostForm
+        template_name = "blogera/post_form.html"
+        success_url = reverse_lazy("blogera:post_list")
+
+        def form_valid(self, form):
+            form.instance.author = self.request.user
+            messages.success(self.request, "Пост создан и ожидает модерации")
+            return super().form_valid(form)
 
 
 class PostUpdateView(LoginRequiredMixin, OwnerOrModeratorMixin, UpdateView):
@@ -72,19 +114,12 @@ class PostDeleteView(LoginRequiredMixin, OwnerOrModeratorMixin, DeleteView):
     success_url = reverse_lazy("blogera:post_list")
 
 
-class PostUnpublishView(
-    LoginRequiredMixin,
-    PostModerationMixin,
-    View
-):
+class PostUnpublishView(LoginRequiredMixin, PostModerationMixin, View):
     def post(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
-
         post.is_published = False
-        post.save()
+        post.save(update_fields=["is_published"])
 
-        messages.success(
-            request,
-            f"Пост «{post.title}» снят с публикации"
-        )
+        messages.success(request, f"Пост «{post.title}» снят с публикации")
         return redirect("blogera:post_list")
+

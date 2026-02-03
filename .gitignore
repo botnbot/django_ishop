@@ -136,3 +136,4 @@ data/out/
 .db
 __pycache__
 /media/
+*_temp.py
