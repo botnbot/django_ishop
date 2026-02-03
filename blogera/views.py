@@ -71,6 +71,13 @@ class PostListView(ListView):
                     and (user == post.author or user.is_staff or user.has_perm("blogera.can_unpublish_post"))
             )
             post.can_delete = user.is_authenticated and (user == post.author or user.is_staff)
+
+            post.can_publish = (
+                    user.is_authenticated
+                    and user.has_perm("blogera.can_publish_post")
+                    and not post.is_published
+            )
+
             post.can_unpublish = (
                     user.is_authenticated
                     and user.has_perm("blogera.can_unpublish_post")
@@ -80,7 +87,7 @@ class PostListView(ListView):
         return context
 
 
-class PostDetailsView(LoginRequiredMixin, DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = "blogera/post_details.html"
     context_object_name = "post"
@@ -99,6 +106,29 @@ class PostDetailsView(LoginRequiredMixin, DetailView):
             return post
 
         raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        post = self.object
+
+        context["can_edit"] = (
+                user.is_authenticated
+                and (user == post.author or user.is_staff or user.has_perm("blogera.can_unpublish_post"))
+        )
+        context["can_delete"] = user.is_authenticated and (user == post.author or user.is_staff)
+        context["can_unpublish"] = (
+                user.is_authenticated
+                and user.has_perm("blogera.can_unpublish_post")
+                and post.is_published
+        )
+        context["can_publish"] = (
+                user.is_authenticated
+                and user.has_perm("blogera.can_publish_post")
+                and not post.is_published
+        )
+
+        return context
 
 
 class PostUpdateView(LoginRequiredMixin, OwnerOrModeratorMixin, UpdateView):
@@ -121,4 +151,16 @@ class PostUnpublishView(LoginRequiredMixin, PostModerationMixin, View):
         post.save(update_fields=["is_published"])
 
         messages.success(request, f"Пост «{post.title}» снят с публикации")
+        return redirect("blogera:post_list")
+
+
+class PostPublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "blogera.can_publish_post"
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.is_published = True
+        post.save(update_fields=["is_published"])
+
+        messages.success(request, f"Пост «{post.title}» опубликован")
         return redirect("blogera:post_list")

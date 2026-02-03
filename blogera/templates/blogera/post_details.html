@@ -12,6 +12,8 @@
     <p>{{ post.content }}</p>
     {% if user.is_authenticated and post.author == user %}
     <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'blogera:post_unpublish' post.pk %}" class="btn btn-warning">Снять с публикации</a>
+    <a href="{% url 'blogera:post_publish' post.pk %}" class="btn btn-warning">Опубликовать</a>
     <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
     {% endif %}
     <a href="{% url 'blogera:post_list' %}" class="btn btn-secondary">Назад</a>
