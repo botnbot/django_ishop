@@ -10,7 +10,6 @@ from blogera.forms import PostForm
 from blogera.models import Post
 
 
-
 class PostModerationMixin(PermissionRequiredMixin):
     """Миксин для пользователей с правом can_unpublish_post"""
     permission_required = "blogera.can_unpublish_post"
@@ -35,6 +34,18 @@ class OwnerOrModeratorMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         messages.error(self.request, "У вас нет прав для этого действия")
         return redirect("blogera:post_list")
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = "blogera/post_form.html"
+    success_url = reverse_lazy("blogera:post_list")
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        messages.success(self.request, "Пост создан и ожидает модерации")
+        return super().form_valid(form)
 
 
 class PostListView(ListView):
@@ -69,7 +80,7 @@ class PostListView(ListView):
         return context
 
 
-class PostDetailView(LoginRequiredMixin, DetailView):
+class PostDetailsView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = "blogera/post_details.html"
     context_object_name = "post"
@@ -88,17 +99,6 @@ class PostDetailView(LoginRequiredMixin, DetailView):
             return post
 
         raise PermissionDenied
-
-    class PostCreateView(LoginRequiredMixin, CreateView):
-        model = Post
-        form_class = PostForm
-        template_name = "blogera/post_form.html"
-        success_url = reverse_lazy("blogera:post_list")
-
-        def form_valid(self, form):
-            form.instance.author = self.request.user
-            messages.success(self.request, "Пост создан и ожидает модерации")
-            return super().form_valid(form)
 
 
 class PostUpdateView(LoginRequiredMixin, OwnerOrModeratorMixin, UpdateView):
@@ -122,4 +122,3 @@ class PostUnpublishView(LoginRequiredMixin, PostModerationMixin, View):
 
         messages.success(request, f"Пост «{post.title}» снят с публикации")
         return redirect("blogera:post_list")
-
