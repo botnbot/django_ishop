@@ -24,7 +24,17 @@
 {% include "includes/theme_toggle.html" %}
 {% include "includes/icons.html" %}
 {% include "includes/menu.html" %}
-<main>
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="container mt-4">
     {% block content %}
     {% endblock %}
 </main>
