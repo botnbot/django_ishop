@@ -19,12 +19,12 @@
             {% endif %}
             <p>{{ post.content|truncatewords:30 }}</p>
             <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-secondary">Подробнее</a>
-            {% if can_unpublish %}
-            <form method="post" action="{% url 'blogera:post_unpublish' post.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-warning">Снять с публикации</button>
-            </form>
-            {% endif %}
+<!--            {% if can_unpublish %}-->
+<!--            <form method="post" action="{% url 'blogera:post_unpublish' post.pk %}">-->
+<!--                {% csrf_token %}-->
+<!--                <button class="btn btn-warning">Снять с публикации</button>-->
+<!--            </form>-->
+<!--            {% endif %}-->
 
             {% if can_publish %}
             <form method="post" action="{% url 'blogera:post_publish' post.pk %}">
