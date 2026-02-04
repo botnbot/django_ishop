@@ -18,10 +18,11 @@
         {% endif %}
 
         <br>
-        <form action="{% url 'catalog:product_detail' product.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-secondary btn-sm">Подробнее</button>
-            </form>
+        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-secondary">Подробнее</a>
+<!--        <form action="{% url 'catalog:product_detail' product.pk %}" method="post" style="display:inline;">-->
+<!--                {% csrf_token %}-->
+<!--                <button type="submit" class="btn btn-secondary btn-sm">Подробнее</button>-->
+<!--            </form>-->
 
         {% if product.can_edit %}
             <form action="{% url 'catalog:product_update' product.pk %}" method="post" style="display:inline;">
@@ -37,12 +38,12 @@
             </form>
         {% endif %}
 
-        {% if product.can_unpublish %}
-        <form action="{% url 'catalog:product_unpublish' product.pk %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-warning btn-sm">Снять с публикации</button>
-        </form>
-        {% endif %}
+<!--        {% if product.can_unpublish %}-->
+<!--        <form action="{% url 'catalog:product_unpublish' product.pk %}" method="post" style="display:inline;">-->
+<!--            {% csrf_token %}-->
+<!--            <button type="submit" class="btn btn-warning btn-sm">Снять с публикации</button>-->
+<!--        </form>-->
+<!--        {% endif %}-->
     </li>
     {% empty %}
     <li>Продуктов пока нет.</li>

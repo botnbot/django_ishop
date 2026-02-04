@@ -38,6 +38,9 @@
             <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
             {% endif %}
 
+            {% if post.can_publish %}
+            <a href="{% url 'blogera:post_publish' post.pk %}" class="btn btn-danger">Снять с публикации</a>
+            {% endif %}
         </div>
     </div>
     {% empty %}

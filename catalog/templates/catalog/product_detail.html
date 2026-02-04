@@ -13,28 +13,23 @@
 
 
     <hr>
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary" style="display:inline;">Назад к списку</a>
 
-<!--    <a class="btn btn-secondary" href="{% url 'catalog:product_list' %}">Назад к списку</a>-->
-
-<!--    {% if can_edit %}-->
-<!--    <a class="btn btn-secondary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>-->
-<!--    {% endif %}-->
+    {% if can_edit %}
+    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary" style="display:inline;">Редактировать</a>
+    {% endif %}
 
     {% if can_unpublish %}
 <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" style="display:inline;">
     {% csrf_token %}
-    <button type="submit" class="btn btn-warning btn-sm">
-        Снять с публикации
-    </button>
+    <button class="btn btn-warning">Снять с публикации</button>
 </form>
 {% endif %}
 
 {% if can_publish %}
-<form method="post" action="{% url 'catalog:product_publish' product.pk %}" style="display:inline;">
+<form method="post" action="{% url 'catalog:product_publish' product.pk %}">
     {% csrf_token %}
-    <button type="submit" class="btn btn-success btn-sm">
-        Опубликовать
-    </button>
+    <button class="btn btn-success" style="display:inline;" >Опубликовать</button>
 </form>
 {% endif %}
 
@@ -43,6 +38,5 @@
     {% endif %}
 
 
-
-    {% endblock %}
 </div>
+    {% endblock %}
