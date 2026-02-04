@@ -18,11 +18,26 @@
             <img src="{{ post.image.url }}" class="img-fluid mb-3" style="max-width:300px;">
             {% endif %}
             <p>{{ post.content|truncatewords:30 }}</p>
-            <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-primary">Подробнее</a>
+            <a href="{% url 'blogera:post_details' post.pk %}" class="btn btn-secondary">Подробнее</a>
+            {% if can_unpublish %}
+            <form method="post" action="{% url 'blogera:post_unpublish' post.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-warning">Снять с публикации</button>
+            </form>
+            {% endif %}
+
+            {% if can_publish %}
+            <form method="post" action="{% url 'blogera:post_publish' post.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-success">Опубликовать</button>
+            </form>
+            {% endif %}
+
             {% if user.is_authenticated and post.author == user %}
-            <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+            <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-secondary">Редактировать</a>
             <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
             {% endif %}
+
         </div>
     </div>
     {% empty %}

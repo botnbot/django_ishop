@@ -1,6 +1,7 @@
 from django.urls import path
 
 from catalog import views
+from catalog.views import ProductPublishView
 
 app_name = "catalog"
 

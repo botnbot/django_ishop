@@ -18,14 +18,23 @@
         {% endif %}
 
         <br>
-        <a href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+        <form action="{% url 'catalog:product_detail' product.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-sm">Подробнее</button>
+            </form>
 
         {% if product.can_edit %}
-        | <a href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+            <form action="{% url 'catalog:product_update' product.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-sm">Редактировать</button>
+            </form>
         {% endif %}
 
         {% if product.can_delete %}
-        | <a href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+            <form action="{% url 'catalog:product_delete' product.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
         {% endif %}
 
         {% if product.can_unpublish %}
