@@ -4,7 +4,7 @@ from catalog.models import Product
 from django.contrib.contenttypes.models import ContentType
 
 class Command(BaseCommand):
-    help = 'Создает группу "Модератор продуктов" с разрешениями'
+    help = 'Создает группу "Модератор продуктов" с нужными правами'
 
     def handle(self, *args, **kwargs):
         # Создаем группу
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         # Назначаем права: добавление, изменение и удаление продукта
         permissions = Permission.objects.filter(
             content_type=content_type,
-            codename__in=['add_product', 'change_product', 'delete_product']
+            codename__in=['can_unpublish_product', 'delete_product']
         )
         group.permissions.set(permissions)
 
