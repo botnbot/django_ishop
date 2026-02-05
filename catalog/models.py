@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.conf import settings
 from django.db import models
 
@@ -42,8 +44,12 @@ class Product(models.Model):
         on_delete=models.CASCADE,
         related_name="products",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now=True
+    )
+    updated_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
         permissions = [
