@@ -36,6 +36,29 @@ class OwnerOrModeratorMixin(UserPassesTestMixin):
         return redirect("blogera:post_list")
 
 
+class ViewCountMixin:
+    """
+    Миксин для подсчёта просмотров.
+    Работает в get()
+    """
+
+    def count_view(self, obj):
+        request = self.request
+
+        # не считаем просмотры автора
+        if hasattr(obj, "author") and obj.author == request.user:
+            return
+
+        session_key = f"viewed_{obj.__class__.__name__}_{obj.pk}"
+
+        if request.session.get(session_key):
+            return
+
+        obj.views_count += 1
+        obj.save(update_fields=["views_count"])
+        request.session[session_key] = True
+
+
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -87,25 +110,26 @@ class PostListView(ListView):
         return context
 
 
-class PostDetailView(LoginRequiredMixin, DetailView):
+class PostDetailView(LoginRequiredMixin, ViewCountMixin, DetailView):
     model = Post
     template_name = "blogera/post_details.html"
     context_object_name = "post"
 
-    def get_object(self, queryset=None):
-        post = super().get_object(queryset)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
 
-        if post.is_published:
-            return post
+        if not self.object.is_published:
+            if not (
+                request.user == self.object.author
+                or request.user.has_perm("blogera.can_unpublish_post")
+                or request.user.is_staff
+            ):
+                raise PermissionDenied
 
-        if (
-                self.request.user == post.author
-                or self.request.user.has_perm("blogera.can_unpublish_post")
-                or self.request.user.is_staff
-        ):
-            return post
+        self.count_view(self.object)
 
-        raise PermissionDenied
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
