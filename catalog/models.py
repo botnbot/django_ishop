@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from django.conf import settings
 from django.db import models
 
@@ -45,10 +43,10 @@ class Product(models.Model):
         related_name="products",
     )
     created_at = models.DateTimeField(
-        auto_now=True
+        auto_now_add=True
     )
     updated_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now=True
     )
 
     class Meta:
@@ -63,7 +61,6 @@ class Product(models.Model):
     @property
     def is_published(self):
         return self.status == self.STATUS_PUBLISHED
-
 
 
 class Category(models.Model):

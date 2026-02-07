@@ -11,6 +11,33 @@ from catalog.forms import ProductForm, ContactForm
 from catalog.models import Product
 
 
+class OwnerRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user == obj.owner or self.request.user.is_staff
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Редактировать продукт может только владелец")
+        return redirect("catalog:product_list")
+
+
+class OwnerOrProductModeratorRequiredMixin(UserPassesTestMixin):
+    """Владелец или член группы 'Модератор продуктов'"""
+
+    def test_func(self):
+        obj = self.get_object()
+        user = self.request.user
+
+        if user == obj.owner:
+            return True
+
+        return user.groups.filter(name="Модератор продуктов").exists()
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Доступно только владельцу или модератору продуктов")
+        return redirect("catalog:product_list")
+
+
 class ProductModerationMixin(PermissionRequiredMixin):
     """Миксин для пользователей с правом can_unpublish_product"""
     permission_required = "catalog.can_unpublish_product"
@@ -67,9 +94,18 @@ class ProductsListView(ListView):
 
         for product in context['products']:
             product.can_edit = user.is_authenticated and (
-                    user == product.owner or user.is_staff or user.has_perm('catalog.can_unpublish_product'))
-            product.can_delete = user.is_authenticated and (user == product.owner or user.is_staff)
-            product.can_unpublish = user.is_authenticated and user.has_perm('catalog.can_unpublish_product')
+                    user == product.owner or user.is_staff)  # владелец или staff
+
+            product.can_delete = (
+                    user.is_authenticated and (
+                    user == product.owner
+                    or user.is_staff
+                    or user.groups.filter(name="Модератор продуктов").exists()  # владелец ИЛИ staff ИЛИ модератор
+            )
+            )
+
+            product.can_unpublish = user.is_authenticated and user.has_perm(
+                'catalog.can_unpublish_product')  # право can_unpublish_product
         return context
 
 
@@ -85,9 +121,9 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
             return product
 
         if (
-            self.request.user == product.owner
-            or self.request.user.has_perm("catalog.can_unpublish_product")
-            or self.request.user.is_staff
+                self.request.user == product.owner
+                or self.request.user.has_perm("catalog.can_unpublish_product")
+                or self.request.user.is_staff
         ):
             return product
 
@@ -98,13 +134,25 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         product = self.object
         user = self.request.user
 
-        context['can_publish'] = user.is_authenticated and user.has_perm('catalog.can_publish_product') and product.status != Product.STATUS_PUBLISHED
-        context['can_edit'] = user.is_authenticated and (user == product.owner or user.is_staff or user.has_perm('catalog.can_unpublish_product'))
-        context['can_delete'] = user.is_authenticated and (user == product.owner or user.is_staff)
-        context['can_unpublish'] = user.is_authenticated and user.has_perm('catalog.can_unpublish_product') and product.status == Product.STATUS_PUBLISHED
+
+        context['can_edit'] = (
+                user.is_authenticated and (
+                user == product.owner or user.is_staff))
+        context['can_delete'] = (
+                user.is_authenticated
+                and (user == product.owner or user.is_staff))
+        context['can_publish'] = (
+                user.is_authenticated
+                and user.has_perm('catalog.can_publish_product')
+                and product.status != Product.STATUS_PUBLISHED
+        )
+        context["can_unpublish"] = (
+                user.is_authenticated
+                and user.has_perm("catalog.can_unpublish_product")
+                and product.status == Product.STATUS_PUBLISHED
+        )
 
         return context
-
 
 
 class ProductsCreateView(LoginRequiredMixin, CreateView):
@@ -120,14 +168,14 @@ class ProductsCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductsUpdateView(LoginRequiredMixin, OwnerOrModeratorMixin, UpdateView):
+class ProductsUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = "catalog/product_form.html"
     success_url = reverse_lazy("catalog:product_list")
 
 
-class ProductsDeleteView(LoginRequiredMixin, OwnerOrModeratorMixin, DeleteView):
+class ProductsDeleteView(LoginRequiredMixin, OwnerOrProductModeratorRequiredMixin, DeleteView):
     """Удаление доступно владельцу, модератору или staff"""
     model = Product
     template_name = "catalog/product_confirm_delete.html"
@@ -141,8 +189,9 @@ class ProductUnpublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
 
-        product.status = Product.STATUS_UNPUBLISHED
-        product.save(update_fields=["status"])
+        if product.status == Product.STATUS_PUBLISHED:
+            product.status = Product.STATUS_UNPUBLISHED
+            product.save(update_fields=["status"])
 
         messages.success(request, "Продукт снят с публикации")
         return redirect("catalog:product_list")

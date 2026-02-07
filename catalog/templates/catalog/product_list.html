@@ -21,17 +21,33 @@
         <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-secondary">Подробнее</a>
 
         {% if product.can_edit %}
-            <form action="{% url 'catalog:product_update' product.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-secondary btn-sm">Редактировать</button>
-            </form>
+        <a href="{% url 'catalog:product_update' product.pk %}"
+           class="btn btn-secondary btn-sm">Редактировать</a>
+        </a>
+        {% endif %}
+
+        {% if can_unpublish %}
+        <form method="post"
+              action="{% url 'catalog:product_unpublish' product.pk %}"
+              style="display:inline;">
+            {% csrf_token %}
+            <button class="btn btn-secondary btn-sm">
+                Снять с публикации
+            </button>
+        </form>
         {% endif %}
 
         {% if product.can_delete %}
-            <form action="{% url 'catalog:product_delete' product.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-            </form>
+        <form action="{% url 'catalog:product_delete' product.pk %}"
+              method="post"
+              style="display:inline;">
+            {% csrf_token %}
+            <button
+                    type="submit"
+                    class="btn btn-danger btn-sm">
+                Удалить
+            </button>
+        </form>
         {% endif %}
 
     </li>

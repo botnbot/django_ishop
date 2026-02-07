@@ -11,24 +11,46 @@
     <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width:300px;">
     {% endif %}
 
-
     <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-    <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">Назад к списку</a>
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">
+            Назад к списку
+        </a>
 
-    {% if can_edit %}
-    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary">Редактировать</a>
-    {% endif %}
+        {% if product.can_edit %}
+        <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-primary">
+            Редактировать
+        </a>
+        {% endif %}
+
+        {% if can_unpublish %}
+        <form method="post"
+              action="{% url 'catalog:product_unpublish' product.pk %}"
+              style="display:inline-block; margin:0;">
+            {% csrf_token %}
+            <button class="btn btn-warning">
+                Снять с публикации
+            </button>
+        </form>
+        {% endif %}
+
+        {% if can_publish %}
+        <form method="post" action="{% url 'catalog:product_publish' product.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-success">Опубликовать</button>
+        </form>
+        {% endif %}
 
 
-    {% if can_publish %}
-    <form method="post" action="{% url 'catalog:product_publish' product.pk %}" style="display:inline-block; margin:0;">
-        {% csrf_token %}
-        <button class="btn btn-success">Опубликовать</button>
-    </form>
-    {% endif %}
-
-    {% if can_delete %}
-    <a class="btn btn-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
-    {% endif %}
+        {% if product.can_delete %}
+        <form method="post"
+              action="{% url 'catalog:product_delete' product.pk %}"
+              style="display:inline-block; margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                Удалить
+            </button>
+        </form>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
