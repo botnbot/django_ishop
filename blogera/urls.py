@@ -1,20 +1,22 @@
 from django.urls import path
-
-from blogera.apps import BlogeraConfig
 from blogera.views import (
     PostListView,
-    PostDetailsView,
+    PostDetailView,
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
+    PostUnpublishView,
+    PostPublishView,
 )
 
-app_name = BlogeraConfig.name
+app_name = "blogera"
 
 urlpatterns = [
-    path("post_list/", PostListView.as_view(), name="post_list"),
-    path("post_details/<int:pk>/", PostDetailsView.as_view(), name="post_details"),
-    path("post_create/", PostCreateView.as_view(), name="post_create"),
-    path("post_update/<int:pk>/", PostUpdateView.as_view(), name="post_update"),
-    path("post_delete/<int:pk>/", PostDeleteView.as_view(), name="post_delete"),
+    path("", PostListView.as_view(), name="post_list"),
+    path("post/<int:pk>/", PostDetailView.as_view(), name="post_details"),
+    path("post/create/", PostCreateView.as_view(), name="post_create"),
+    path("post/<int:pk>/update/", PostUpdateView.as_view(), name="post_update"),
+    path("post/<int:pk>/delete/", PostDeleteView.as_view(), name="post_delete"),
+    path("post/<int:pk>/unpublish/", PostUnpublishView.as_view(), name="post_unpublish"),
+    path("post/<int:pk>/publish/", PostPublishView.as_view(), name="post_publish"),
 ]

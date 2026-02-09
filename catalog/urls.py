@@ -1,31 +1,18 @@
 from django.urls import path
 
-from catalog.apps import CatalogConfig
-from catalog.views import (
-    ProductsListView,
-    ProductDetailsView,
-    ContactsView,
-    ProductsCreateView,
-    ProductsUpdateView,
-    ProductDeleteView,
-)
+from catalog import views
 
-app_name = CatalogConfig.name
+app_name = "catalog"
 
 urlpatterns = [
-    path("", ProductsListView.as_view(), name="product_list"),
-    path("products/", ProductsListView.as_view(), name="products_list"),
-    path("product/new/", ProductsCreateView.as_view(), name="products_create"),
-    path(
-        "products/<int:pk>/edit/", ProductsUpdateView.as_view(), name="products_update"
-    ),
-    path(
-        "product_details/<int:pk>/",
-        ProductDetailsView.as_view(),
-        name="product_details",
-    ),
-    path(
-        "products/<int:pk>/delete/", ProductDeleteView.as_view(), name="product_delete"
-    ),
-    path("contacts/", ContactsView.as_view(), name="contacts"),
+    path("", views.ProductsListView.as_view(), name="product_list"),  # список продуктов
+    path("product/<int:pk>/", views.ProductDetailView.as_view(), name="product_detail"),  # детали продукта
+    path("product/create/", views.ProductsCreateView.as_view(), name="product_create"),  # создать продукт
+    path("product/<int:pk>/update/", views.ProductsUpdateView.as_view(), name="product_update"),  # редактировать продукт
+    path("product/<int:pk>/delete/", views.ProductsDeleteView.as_view(), name="product_delete"),  # удалить продукт
+    path("contacts/", views.ContactsView.as_view(), name="contacts"),  # контакты
+    path("product/<int:pk>/unpublish/", views.ProductUnpublishView.as_view(), name="product_unpublish"), # Снять продукт с публикации
+    path("product/<int:pk>/publish/", views.ProductPublishView.as_view(), name="product_publish"), # Опубликовать продукт
 ]
+
+

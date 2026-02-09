@@ -10,10 +10,27 @@
     {% endif %}
 
     <p>{{ post.content }}</p>
-    {% if user.is_authenticated and post.author == user %}
-    <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
-    <a href="{% url 'blogera:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
-    {% endif %}
-    <a href="{% url 'blogera:post_list' %}" class="btn btn-secondary">Назад</a>
+    <div class="mt-3 d-flex gap-2 flex-wrap">
+        {% if post.can_edit %}
+        <a href="{% url 'blogera:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+        {% endif %}
+
+        {% if post.can_unpublish %}
+        <form method="post" action="{% url 'blogera:post_unpublish' post.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-secondary">Снять с публикации</button>
+        </form>
+        {% endif %}
+
+        {% if post.can_publish %}
+        <form method="post" action="{% url 'blogera:post_publish' post.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-success">Опубликовать</button>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'blogera:post_list' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+
 </div>
 {% endblock %}

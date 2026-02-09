@@ -24,21 +24,17 @@
 {% include "includes/theme_toggle.html" %}
 {% include "includes/icons.html" %}
 {% include "includes/menu.html" %}
-
-</header>
-<main>
-    <section class="py-2 text-center container">
-        <div class="row py-lg-2">
-
-            <div class="col-lg-6 col-md-8 mx-auto">
-    <h2 class="fw-light">
-        <a href="{% url 'catalog:product_list' %}" style="text-decoration: none; color: inherit;">
-            Камни и руны
-        </a>
-    </h2>
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
 </div>
+{% endif %}
 
-    </section>
+<main class="container mt-4">
     {% block content %}
     {% endblock %}
 </main>
