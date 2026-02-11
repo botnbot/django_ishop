@@ -1,3 +1,6 @@
+# Create your models here.
+
+
 from django.conf import settings
 from django.db import models
 
@@ -32,27 +35,31 @@ class Product(models.Model):
         decimal_places=2,
         verbose_name="Цена",
     )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default=STATUS_PENDING,
     )
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="products",
+        verbose_name="Владелец",
     )
+
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True, verbose_name="Дата создания"
     )
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True, verbose_name="Дата изменения"
     )
 
     class Meta:
         permissions = [
-            ("can_unpublish_product", "Может снимать продукт с публикации"),
             ("can_publish_product", "Может публиковать продукт"),
+            ("can_unpublish_product", "Может снимать продукт с публикации"),
         ]
 
     def __str__(self):
@@ -61,6 +68,7 @@ class Product(models.Model):
     @property
     def is_published(self):
         return self.status == self.STATUS_PUBLISHED
+
 
 
 class Category(models.Model):

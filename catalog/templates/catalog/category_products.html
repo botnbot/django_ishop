@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Продукты категории {{category.name}}</h1>
+<ul>
+    {% for product in products %}
+    <li>
+        <strong>{{ product.name }}</strong>
+        -{{ product.get_status_display }}
+        -{{ product.price }} руб.
+
+        <a href="{% url 'catalog:product_detail' product.pk %}">
+            Подробнее
+        </a>
+    </li>
+    {% empty %}
+    <li>В этой категории нет продуктов.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'catalog:product_list' %}">
+    Назад к списку продуктов
+</a>
+
+{% endblock %}

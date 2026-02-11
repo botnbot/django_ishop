@@ -19,27 +19,27 @@
                 </div>
 
                 <!-- Пользователь -->
-                <div class="d-flex gap-3 align-items-center">
-                    {% if user.is_authenticated %}
-                    <form action="{% url 'users:logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="btn btn-link link-secondary p-0 text-decoration-none">
-                            Выйти
-                        </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'users:login' %}"
-                       class="link-secondary text-decoration-none">
-                        Войти
-                    </a>
+<!--                <div class="d-flex gap-3 align-items-center">-->
+<!--                    {% if user.is_authenticated %}-->
+<!--                    <form action="{% url 'users:logout' %}" method="post">-->
+<!--                        {% csrf_token %}-->
+<!--                        <button type="submit"-->
+<!--                                class="btn btn-link link-secondary p-0 text-decoration-none">-->
+<!--                            Выйти-->
+<!--                        </button>-->
+<!--                    </form>-->
+<!--                    {% else %}-->
+<!--                    <a href="{% url 'users:login' %}"-->
+<!--                       class="link-secondary text-decoration-none">-->
+<!--                        Войти-->
+<!--                    </a>-->
 
-                    <a href="{% url 'users:register' %}"
-                       class="link-secondary text-decoration-none">
-                        Регистрация
-                    </a>
-                    {% endif %}
-                </div>
+<!--                    <a href="{% url 'users:register' %}"-->
+<!--                       class="link-secondary text-decoration-none">-->
+<!--                        Регистрация-->
+<!--                    </a>-->
+<!--                    {% endif %}-->
+<!--                </div>-->
 
                 <!-- Контакты -->
                 <div>
@@ -61,6 +61,30 @@
                   text-decoration-none text-secondary fs-3 fw-light">
                 Камни и руны
             </a>
+
+            <div class="d-flex gap-3 align-items-center">
+                {% if user.is_authenticated %}
+                <form action="{% url 'users:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-link link-secondary p-0 text-decoration-none">
+                        Выйти
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'users:login' %}"
+                   class="link-secondary text-decoration-none">
+                    Войти
+                </a>
+
+                <a href="{% url 'users:register' %}"
+                   class="link-secondary text-decoration-none">
+                    Регистрация
+                </a>
+                {% endif %}
+
+
+            </div>
 
             <div class="d-flex justify-content-end">
                 <button class="navbar-toggler"
