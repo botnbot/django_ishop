@@ -198,8 +198,8 @@ class ProductPublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class CategoryProductsListView(ListView):
     model = Product
-    template_name = "templates/category_products.html"
-    context_object_name = "chosen_products"
+    template_name = "catalog/category_products.html"
+    context_object_name = "products"
 
     def get_queryset(self):
         self.category = get_object_or_404(Category, pk=self.kwargs['pk'])
