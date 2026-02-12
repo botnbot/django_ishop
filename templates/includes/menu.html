@@ -18,30 +18,6 @@
                     </a>
                 </div>
 
-                <!-- Пользователь -->
-                <div class="d-flex gap-3 align-items-center">
-                    {% if user.is_authenticated %}
-                    <form action="{% url 'users:logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="btn btn-link link-secondary p-0 text-decoration-none">
-                            Выйти
-                        </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'users:login' %}"
-                       class="link-secondary text-decoration-none">
-                        Войти
-                    </a>
-
-                    <a href="{% url 'users:register' %}"
-                       class="link-secondary text-decoration-none">
-                        Регистрация
-                    </a>
-                    {% endif %}
-                </div>
-
-                <!-- Контакты -->
                 <div>
                     <a href="{% url 'catalog:contacts' %}"
                        class="link-secondary text-decoration-none">
@@ -59,8 +35,38 @@
             <a href="{% url 'catalog:product_list' %}"
                class="position-absolute top-50 start-50 translate-middle
                   text-decoration-none text-secondary fs-3 fw-light">
-                Камни и руны
+               <h2> Камни и руны</h2>
             </a>
+
+            <div class="d-flex gap-3 align-items-center">
+                {% if user.is_authenticated %}
+                <h5 class="text-secondary mb-0">
+                    {{ user.email|default:user.username }}
+                </h5>
+
+                <form action="{% url 'users:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-link link-secondary p-0 text-decoration-none">
+                        Выйти
+                    </button>
+                </form>
+
+                {% else %}
+                <h6 class="text-secondary mb-0">Гость</h6>
+
+                <a href="{% url 'users:login' %}"
+                   class="link-secondary text-decoration-none">
+                    Войти
+                </a>
+
+                <a href="{% url 'users:register' %}"
+                   class="link-secondary text-decoration-none">
+                    Регистрация
+                </a>
+                {% endif %}
+            </div>
+
 
             <div class="d-flex justify-content-end">
                 <button class="navbar-toggler"

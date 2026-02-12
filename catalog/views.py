@@ -8,7 +8,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.views.generic.edit import FormView
 
 from catalog.forms import ProductForm, ContactForm
-from catalog.models import Product
+from catalog.models import Product, Category
+from catalog.services import get_products_from_cache, get_products_by_category
 
 
 class OwnerRequiredMixin(UserPassesTestMixin):
@@ -38,43 +39,6 @@ class OwnerOrProductModeratorRequiredMixin(UserPassesTestMixin):
         return redirect("catalog:product_list")
 
 
-class ProductModerationMixin(PermissionRequiredMixin):
-    """Миксин для пользователей с правом can_unpublish_product"""
-    permission_required = "catalog.can_unpublish_product"
-    raise_exception = False
-
-    def handle_no_permission(self):
-        messages.error(self.request, "У вас нет прав для этого действия")
-        return redirect("catalog:product_list")
-
-
-class OwnerOrModeratorMixin(UserPassesTestMixin):
-    """Владелец продукта или модератор с правом can_unpublish_product"""
-
-    def test_func(self):
-        obj = self.get_object()
-        return (
-                self.request.user == obj.owner or
-                self.request.user.has_perm("catalog.can_unpublish_product") or
-                self.request.user.is_staff
-        )
-
-    def handle_no_permission(self):
-        messages.error(self.request, "У вас нет прав для этого действия")
-        return redirect("catalog:product_list")
-
-
-class StaffRequiredMixin(UserPassesTestMixin):
-    """Проверка, что пользователь staff"""
-
-    def test_func(self):
-        return self.request.user.is_staff
-
-    def handle_no_permission(self):
-        messages.error(self.request, "У вас нет прав для этого действия")
-        return redirect("catalog:product_list")
-
-
 class ProductsListView(ListView):
     model = Product
     template_name = "catalog/product_list.html"
@@ -82,11 +46,18 @@ class ProductsListView(ListView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated:
-            return Product.objects.filter(
-                status=Product.STATUS_PUBLISHED
-            ) | Product.objects.filter(owner=user)
-        return Product.objects.filter(status=Product.STATUS_PUBLISHED)
+        products = get_products_from_cache()
+
+        if not user.is_authenticated:
+            return products.filter(status=Product.STATUS_PUBLISHED)
+
+        if user.is_staff or user.has_perm("catalog.can_unpublish_product"):
+            return products
+
+        return (
+                products.filter(status=Product.STATUS_PUBLISHED)
+                | products.filter(owner=user)
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,12 +71,14 @@ class ProductsListView(ListView):
                     user.is_authenticated and (
                     user == product.owner
                     or user.is_staff
-                    or user.groups.filter(name="Модератор продуктов").exists()  # владелец ИЛИ staff ИЛИ модератор
+                    or user.has_perm("catalog.can_delete_product")
             )
             )
 
-            product.can_unpublish = user.is_authenticated and user.has_perm(
-                'catalog.can_unpublish_product')  # право can_unpublish_product
+            product.can_unpublish = (user.is_authenticated
+                                     and user.has_perm('catalog.can_unpublish_product')
+                                     and product.status == Product.STATUS_PUBLISHED
+                                     )  # право can_unpublish_product
         return context
 
 
@@ -133,7 +106,6 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
         user = self.request.user
-
 
         context['can_edit'] = (
                 user.is_authenticated and (
@@ -175,12 +147,29 @@ class ProductsUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     success_url = reverse_lazy("catalog:product_list")
 
 
-class ProductsDeleteView(LoginRequiredMixin, OwnerOrProductModeratorRequiredMixin, DeleteView):
-    """Удаление доступно владельцу, модератору или staff"""
+class ProductsDeleteView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    DeleteView
+):
     model = Product
     template_name = "catalog/product_confirm_delete.html"
     context_object_name = "product"
     success_url = reverse_lazy("catalog:product_list")
+
+    def test_func(self):
+        product = self.get_object()
+        user = self.request.user
+
+        return (
+                user == product.owner
+                or user.is_staff
+                or user.has_perm("catalog.can_unpublish_product")
+        )
+
+    def handle_no_permission(self):
+        messages.error(self.request, "У вас нет прав для удаления")
+        return redirect("catalog:product_list")
 
 
 class ProductUnpublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -206,6 +195,23 @@ class ProductPublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
         product.save(update_fields=["status"])
         messages.success(request, "Продукт опубликован")
         return redirect("catalog:product_list")
+
+
+class CategoryProductsListView(ListView):
+    model = Product
+    template_name = "catalog/category_products.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, pk=self.kwargs['pk'])
+        return get_products_by_category(category_id=self.category.pk,
+                                        user=self.request.user
+                                        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
 
 
 class ContactsView(FormView):
