@@ -71,12 +71,14 @@ class ProductsListView(ListView):
                     user.is_authenticated and (
                     user == product.owner
                     or user.is_staff
-                    or user.has_perm("catalog.can_unpublish_product")
+                    or user.has_perm("catalog.can_delete_product")
             )
             )
 
-            product.can_unpublish = user.is_authenticated and user.has_perm(
-                'catalog.can_unpublish_product')  # право can_unpublish_product
+            product.can_unpublish = (user.is_authenticated
+                                     and user.has_perm('catalog.can_unpublish_product')
+                                     and product.status == Product.STATUS_PUBLISHED
+                                     )  # право can_unpublish_product
         return context
 
 
@@ -104,7 +106,6 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
         user = self.request.user
-
 
         context['can_edit'] = (
                 user.is_authenticated and (
@@ -161,9 +162,9 @@ class ProductsDeleteView(
         user = self.request.user
 
         return (
-            user == product.owner
-            or user.is_staff
-            or user.has_perm("catalog.can_unpublish_product")
+                user == product.owner
+                or user.is_staff
+                or user.has_perm("catalog.can_unpublish_product")
         )
 
     def handle_no_permission(self):
@@ -207,7 +208,7 @@ class CategoryProductsListView(ListView):
                                         user=self.request.user
                                         )
 
-    def get_context_data(self,**kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = self.category
         return context

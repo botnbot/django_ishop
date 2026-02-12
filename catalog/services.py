@@ -1,26 +1,24 @@
-from itertools import product
-
 from django.core.cache import cache
+from django.db.models import Q
 
 from catalog.models import Product
 from config.settings import CACHE_ENABLED
 
 
 def get_products_from_cache():
-    """Получение продуктов из кэша, если кэш пуст - получение из базы"""
-    if not CACHE_ENABLED == True:
+    if not CACHE_ENABLED:
         return Product.objects.all()
-    key = 'product_list'
-    products = cache.get(key)
-    if products is not None:
-        return products
-    products = Product.objects.all()
-    cache.set(key, products, timeout=10)
-    return products
 
+    key = "product_list_ids"
+    product_ids = cache.get(key)
 
-from django.db.models import Q
-from catalog.models import Product
+    if product_ids is None:
+        product_ids = list(
+            Product.objects.values_list("id", flat=True)
+        )
+        cache.set(key, product_ids, timeout=60)
+
+    return Product.objects.filter(id__in=product_ids)
 
 
 def get_products_by_category(category_id, user=None):

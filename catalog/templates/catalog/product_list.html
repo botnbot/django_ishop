@@ -17,22 +17,23 @@
         — {{ product.price }} руб.
 
         {% if product.image %}
-            <br>
-            <img src="{{ product.image.url }}"
-                 alt="{{ product.name }}"
-                 style="max-width:150px;">
+        <br>
+        <img src="{{ product.image.url }}"
+             alt="{{ product.name }}"
+             style="max-width:150px;">
         {% endif %}
 
         <br>
 
         {% if product.category %}
-        <a href="{% url 'catalog:category_products' product.category.pk %}">
+        <a href="{% url 'catalog:category_products' product.category.pk %}"
+           class="btn btn-warning btn-sm">
             {{ product.category.name }}
         </a>
         {% endif %}
 
         <a href="{% url 'catalog:product_detail' product.pk %}"
-           class="btn btn-secondary">
+           class="btn btn-secondary btn-sm">
             Подробнее
         </a>
 

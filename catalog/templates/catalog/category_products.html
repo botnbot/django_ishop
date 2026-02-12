@@ -5,21 +5,22 @@
 <h1>Продукты категории {{category.name}}</h1>
 <ul>
     {% for product in products %}
-    <li>
+    <li class="mb-3">
         <strong>{{ product.name }}</strong>
         -{{ product.get_status_display }}
         -{{ product.price }} руб.
 
-        <a href="{% url 'catalog:product_detail' product.pk %}">
+        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-secondary btn-sm">
             Подробнее
         </a>
     </li>
     {% empty %}
-    <li>В этой категории нет продуктов.</li>
+    <li class="mb-3" >В этой категории нет продуктов.</li>
     {% endfor %}
 </ul>
 
-<a href="{% url 'catalog:product_list' %}">
+<a href="{% url 'catalog:product_list' %}"
+     class="btn btn-secondary btn-sm" >
     Назад к списку продуктов
 </a>
 
